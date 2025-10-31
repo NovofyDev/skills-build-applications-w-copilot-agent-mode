@@ -45,10 +45,19 @@ DATABASES = {
 }
 
 import os
-CODESPACE_NAME = os.environ.get('CODESPACE_NAME')
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
-if CODESPACE_NAME:
-    ALLOWED_HOSTS.append(f"{CODESPACE_NAME}-8000.app.github.dev")
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', '*']
+if os.environ.get('CODESPACE_NAME'):
+    ALLOWED_HOSTS.append(f"{os.environ.get('CODESPACE_NAME')}-8000.app.github.dev")
+
+# Add CORS settings for React frontend
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # React development server
+    "http://127.0.0.1:3000",
+]
+
+# Add Codespace frontend URL if in Codespace environment
+if os.environ.get('CODESPACE_NAME'):
+    CORS_ALLOWED_ORIGINS.append(f"https://{os.environ.get('CODESPACE_NAME')}-3000.app.github.dev")
 
 # Application definition
 
@@ -94,11 +103,27 @@ TEMPLATES = [
     },
 ]
 
-# CORS settings
-CORS_ALLOW_ALL_ORIGINS = True
+# CORS settings for React frontend
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_HEADERS = ['*']
-CORS_ALLOW_METHODS = ['*']
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
 
 WSGI_APPLICATION = 'octofit_tracker.wsgi.application'
 

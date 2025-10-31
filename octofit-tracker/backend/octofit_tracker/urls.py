@@ -16,6 +16,7 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
+from django.http import HttpResponseRedirect
 from rest_framework import routers
 from .views import UserViewSet, TeamViewSet, ActivityViewSet, LeaderboardViewSet, WorkoutViewSet
 from rest_framework.response import Response
@@ -35,9 +36,8 @@ def api_root(request):
     if codespace_name:
         base_url = f"https://{codespace_name}-8000.app.github.dev/api/"
     else:
-        base_url = request.build_absolute_uri('/')
-        if not base_url.endswith('/'):
-            base_url += '/'
+        base_url = request.build_absolute_uri('/api/')
+    
     return Response({
         'users': f"{base_url}users/",
         'teams': f"{base_url}teams/",
@@ -46,8 +46,12 @@ def api_root(request):
         'workouts': f"{base_url}workouts/",
     })
 
+def home_redirect(request):
+    return HttpResponseRedirect('/api/')
+
 urlpatterns = [
+    path('', home_redirect, name='home'),
     path('admin/', admin.site.urls),
-    path('', api_root, name='api_root'),
-    path('', include(router.urls)),
+    path('api/', api_root, name='api-root'),
+    path('api/', include(router.urls)),
 ]
